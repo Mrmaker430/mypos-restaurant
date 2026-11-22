@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111827"><title>MyPOS | Restaurant POS</title>
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="MyPOS restaurant billing and point of sale application.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MyPOS">
+  <title>MyPOS | Restaurant POS</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -12,7 +21,7 @@
       <label>Email<input name="email" type="email" value="admin@example.com" required></label>
       <label>Password<input name="password" type="password" value="" placeholder="Your password" required></label>
       <button class="btn primary full">Sign in</button><p id="loginError" class="error"></p>
-      <small class="muted">Use the admin credentials configured in your .env file.</small>
+      <small class="muted">Use the admin credentials configured in your server environment.</small><button type="button" id="installAppLogin" class="btn secondary full install-button" hidden>Install MyPOS app</button>
     </form>
   </div>
   <div id="appView" class="app hidden">
@@ -28,7 +37,7 @@
       <div class="side-bottom"><span id="userName">Admin</span><button id="logoutBtn" class="nav-link">↪ <span>Sign out</span></button></div>
     </aside>
     <main class="main">
-      <header class="topbar"><div><div class="eyebrow">RESTAURANT MANAGEMENT</div><h2 id="pageTitle">Dashboard</h2></div><div class="top-right"><span class="live-dot"></span><span>System online</span><button class="avatar" id="avatar">A</button></div></header>
+      <header class="topbar"><div><div class="eyebrow">RESTAURANT MANAGEMENT</div><h2 id="pageTitle">Dashboard</h2></div><div class="top-right"><span class="live-dot"></span><span>System online</span><button type="button" id="installApp" class="btn secondary install-button" hidden>Install app</button><button class="avatar" id="avatar">A</button></div></header>
       <section id="dashboardPage" class="page">
         <div class="stats-grid">
           <article class="stat-card"><span>Today's sales</span><strong id="salesToday">₹0.00</strong><small>Paid orders only</small></article>
@@ -86,4 +95,5 @@
   <div id="toast" class="toast"></div>
   <div id="receipt" class="receipt"></div>
   <script src="/app.js"></script>
+  <script src="/pwa.js" defer></script>
 </body></html>
