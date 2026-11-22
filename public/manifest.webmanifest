@@ -2,19 +2,25 @@
   "id": "/",
   "name": "MyPOS - Restaurant POS",
   "short_name": "MyPOS",
-  "description": "Restaurant billing and point of sale application",
+  "description": "MyPOS restaurant sales, menu and billing manager",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f4f6fa",
-  "theme_color": "#111827",
+  "theme_color": "#111b2e",
   "categories": [
     "business",
     "finance",
     "productivity"
   ],
   "icons": [
+    {
+      "src": "/icons/mypos-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
