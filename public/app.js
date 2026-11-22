@@ -1,6 +1,6 @@
 const $ = s => document.querySelector(s);
 const money = n => new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(Number(n||0));
-let token=localStorage.getItem("mypos_token"), user=null, products=[], categories=[], cart=[], lastOrder=null;
+let token=localStorage.getItem("mypos_token"), user=null, products=[], categories=[], cart=[];
 const api=async(path,opts={})=>{
   const res=await fetch("/api"+path,{...opts,headers:{"Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{ }),...(opts.headers||{})}});
   const data=await res.json().catch(()=>({}));
@@ -71,12 +71,25 @@ function navigate(page){
   $("#pageTitle").textContent=({dashboard:"Dashboard",pos:"New bill",orders:"Order history",menu:"Menu management",integrations:"Delivery integrations"})[page];
   if(page==="dashboard")loadDashboard();if(page==="orders")loadOrders();if(page==="menu")loadMenu();if(page==="integrations")loadIntegrationStatus();
 }
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>navigate(b.dataset.page));
+
+const sidebar=$("#sidebar"), drawerBackdrop=$("#drawerBackdrop"), menuToggle=$("#menuToggle");
+function setDrawer(open){
+  sidebar.classList.toggle("open",open);
+  drawerBackdrop.classList.toggle("visible",open);
+  menuToggle.setAttribute("aria-expanded",String(open));
+}
+menuToggle.onclick=()=>setDrawer(!sidebar.classList.contains("open"));
+$("#drawerClose").onclick=()=>setDrawer(false);
+drawerBackdrop.onclick=()=>setDrawer(false);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")setDrawer(false)});
+
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{navigate(b.dataset.page);setDrawer(false)});
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>navigate(b.dataset.go));
 async function loadAll(){await Promise.all([loadDashboard(),loadProducts(),loadCategories()]);}
 async function loadDashboard(){
   try{const d=await api("/reports/summary");$("#salesToday").textContent=money(d.sales);$("#ordersToday").textContent=d.orders;$("#cashToday").textContent=money(d.byMethod.cash);$("#upiToday").textContent=money(d.byMethod.upi);
-  $("#topProducts").innerHTML=d.topProducts.length?d.topProducts.map(p=>`<div class="top-item"><span>${escapeHtml(p._id)} <small class="muted">× ${p.quantity}</small></span><b>${money(p.sales)}</b></div>`).join(""):'<div class="list-empty">No sales recorded yet.</div>';}catch(e){toast(e.message)}
+  $("#salesTotal").textContent=money(d.totalSales);$("#itemsSold").textContent=Number(d.itemsSold||0).toLocaleString("en-IN");
+  $("#topProducts").innerHTML=d.itemSummary?.length?d.itemSummary.map(p=>`<div class="top-item"><span>${escapeHtml(p.name)} <small class="muted">× ${p.quantity}</small></span><b>${money(p.sales)}</b></div>`).join(""):'<div class="list-empty">No item sales recorded yet.</div>';}catch(e){toast(e.message)}
 }
 async function loadProducts(){
   products=await api("/products");renderProducts();
@@ -110,15 +123,10 @@ $("#placeOrder").onclick=async()=>{
   const orderType=$("#orderType").value;
   const body={items:cart.map(x=>({productId:x.productId,quantity:x.quantity})),orderType,paymentMethod:$("#paymentMethod").value,customerName:$("#customerName").value.trim(),customerPhone:$("#customerPhone").value.trim(),deliveryAddress:$("#deliveryAddress").value.trim(),discount:Number($("#discount").value)||0};
   const btn=$("#placeOrder");btn.disabled=true;btn.textContent="Saving order...";
-  try{lastOrder=await api("/orders",{method:"POST",body:JSON.stringify(body)});toast(`Order ${lastOrder.orderNumber} saved`);printReceipt(lastOrder);cart=[];$("#discount").value=0;$("#customerName").value="";$("#customerPhone").value="";$("#deliveryAddress").value="";renderCart();await loadDashboard();}
+  try{const savedOrder=await api("/orders",{method:"POST",body:JSON.stringify(body)});toast(`Order ${savedOrder.orderNumber} saved successfully`);cart=[];$("#discount").value=0;$("#customerName").value="";$("#customerPhone").value="";$("#deliveryAddress").value="";renderCart();await loadDashboard();}
   catch(e){toast(e.message)}
-  finally{btn.disabled=false;btn.textContent="Complete payment & print";}
+  finally{btn.disabled=false;btn.textContent="Save order";}
 };
-function printReceipt(o){
-  const date=new Date(o.createdAt).toLocaleString("en-IN");
-  $("#receipt").innerHTML=`<h2>YOUR RESTAURANT</h2><p>Thank you for your order</p><hr><p>${escapeHtml(o.orderNumber)}</p><p>${date}</p><p>${o.orderType.toUpperCase()} · ${o.paymentMethod.toUpperCase()}</p><hr><table>${o.items.map(i=>`<tr><td>${escapeHtml(i.name)} ×${i.quantity}</td><td class="right">${money(i.lineSubtotal)}</td></tr>`).join("")}</table><hr><table><tr><td>Subtotal</td><td class="right">${money(o.subtotal)}</td></tr><tr><td>GST</td><td class="right">${money(o.taxTotal)}</td></tr><tr><td>Discount</td><td class="right">-${money(o.discount)}</td></tr><tr><td class="total">TOTAL</td><td class="right total">${money(o.total)}</td></tr></table><hr><p>Payment: ${o.paymentMethod.toUpperCase()}</p><p>*** THANK YOU ***</p>`;
-  setTimeout(()=>window.print(),250);
-}
 async function loadOrders(){
   const list=await api("/orders");
   $("#ordersTable").innerHTML=list.length?list.map(o=>`<tr><td><b>${escapeHtml(o.orderNumber)}</b></td><td>${new Date(o.createdAt).toLocaleString("en-IN")}</td><td>${o.orderType}</td><td><span class="pill">${escapeHtml(o.source||"pos").toUpperCase()}</span></td><td><b>${money(o.total)}</b></td><td>${o.paymentMethod.toUpperCase()}</td><td><span class="pill ${o.status}">${o.status}</span></td><td><select data-status="${o._id}"><option value="">Update</option>${["received","preparing","ready","completed","cancelled"].map(s=>`<option value="${s}" ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></td></tr>`).join(""):'<tr><td colspan="8" class="list-empty">No orders yet.</td></tr>';
