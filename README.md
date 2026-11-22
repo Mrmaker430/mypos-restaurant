@@ -150,3 +150,13 @@ If you need to reset the admin password:
 5. Immediately remove `ADMIN_RESET_PASSWORD` (or set it to `false`) and redeploy again.
 
 Do not leave `ADMIN_RESET_PASSWORD=true` enabled for normal operation.
+
+
+## Latest app interface updates
+
+- App identity remains **MyPOS**, with a custom SVG brand mark used in the login screen, navigation drawer, browser favicon and PWA manifest.
+- Navigation is now a hamburger-triggered slide-out drawer on desktop and mobile.
+- Checkout is **save-only**: orders are written to MongoDB and the app does not open the print dialog or generate a receipt.
+- Dashboard reports today's sales, all-time paid sales, today's order count, all-time item quantity, today's cash/UPI collections, and a top-ten item sales summary.
+- The dashboard's all-time sales and item totals exclude cancelled orders and unpaid orders.
+- The PWA service worker cache version is updated so installed devices can receive the latest app shell after redeployment.
