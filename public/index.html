@@ -18,9 +18,9 @@
   <div id="loginView" class="login-wrap">
     <form id="loginForm" class="login-card">
       <div class="brand-mark">M</div><h1>MyPOS</h1><p class="muted">Restaurant point of sale</p>
-      <label>Email<input name="email" type="email" value="admin@example.com" required></label>
-      <label>Password<input name="password" type="password" value="" placeholder="Your password" required></label>
-      <button class="btn primary full">Sign in</button><p id="loginError" class="error"></p>
+      <label>Email<input name="email" type="email" placeholder="Enter your admin email" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" placeholder="Your admin password" autocomplete="current-password" required></label>
+      <button type="submit" class="btn primary full">Sign in</button><p id="loginError" class="error"></p>
       <small class="muted">Use the admin credentials configured in your server environment.</small><button type="button" id="installAppLogin" class="btn secondary full install-button" hidden>Install MyPOS app</button>
     </form>
   </div>
@@ -94,6 +94,6 @@
   </div>
   <div id="toast" class="toast"></div>
   <div id="receipt" class="receipt"></div>
-  <script src="/app.js"></script>
+  <script src="/app.js?v=login-fix-20261122"></script>
   <script src="/pwa.js" defer></script>
 </body></html>
