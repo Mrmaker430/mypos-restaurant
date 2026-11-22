@@ -17,7 +17,7 @@ r.get("/summary",async(req,res)=>{
       Order.aggregate([
         {$match:paidMatch},{$unwind:"$items"},
         {$group:{_id:"$items.name",quantity:{$sum:"$items.quantity"},sales:{$sum:"$items.lineSubtotal"}}},
-        {$sort:{quantity:-1}},{$limit:10}
+        {$sort:{quantity:-1}}
       ])
     ]);
     const byMethod={cash:0,upi:0}; methods.forEach(x=>byMethod[x._id]=x.amount);
@@ -28,7 +28,7 @@ r.get("/summary",async(req,res)=>{
       orders,
       itemsSold,
       byMethod,
-      itemSummary:items.map(item=>({name:item._id,quantity:item.quantity,sales:item.sales}))
+      itemSummary:items.slice(0,10).map(item=>({name:item._id,quantity:item.quantity,sales:item.sales}))
     });
   } catch(error) {
     console.error("Report summary failed:",error);
