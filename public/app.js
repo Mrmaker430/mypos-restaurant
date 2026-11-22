@@ -106,3 +106,11 @@ async function loadIntegrationStatus(){
 $("#refreshIntegration").onclick=loadIntegrationStatus;
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 renderCart();boot();
+e("connected",live);
+    $("#zomatoIntegrationState").textContent=live&&s.capabilities?.zomato==="connected"?"Connected":"Awaiting onboarding";
+    $("#swiggyIntegrationState").textContent=live&&s.capabilities?.swiggy==="connected"?"Connected":"Awaiting onboarding";
+  }catch(e){toast(`Could not read integration status: ${e.message}`)}
+}
+$("#refreshIntegration").onclick=loadIntegrationStatus;
+function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+renderCart();boot();
