@@ -12,14 +12,56 @@ function showLogin(){ $("#loginView").classList.remove("hidden");$("#appView").c
 function showApp(){ $("#loginView").classList.add("hidden");$("#appView").classList.remove("hidden");$("#userName").textContent=user.name;$("#avatar").textContent=user.name[0].toUpperCase(); }
 async function boot(){
   if(!token)return showLogin();
-  try{const d=await api("/auth/me");user=d.user;showApp();await loadAll();}
-  catch{token=null;localStorage.removeItem("mypos_token");showLogin();}
+  try {
+    const d=await api("/auth/me");
+    user=d.user;
+  } catch (err) {
+    token=null;
+    user=null;
+    localStorage.removeItem("mypos_token");
+    showLogin();
+    $("#loginError").textContent="Your session expired. Please sign in again.";
+    return;
+  }
+  showApp();
+  try {
+    await loadAll();
+  } catch (err) {
+    toast("Signed in, but some dashboard data could not load: "+err.message);
+  }
 }
 $("#loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();$("#loginError").textContent="";
+  e.preventDefault();
+  const error=$("#loginError");
+  const submit=e.currentTarget.querySelector('button[type="submit"]');
+  const originalText=submit?.textContent || "Sign in";
+  error.textContent="";
+  if(submit){submit.disabled=true;submit.textContent="Signing in...";}
   const f=new FormData(e.currentTarget);
-  try{const d=await api("/auth/login",{method:"POST",body:JSON.stringify({email:f.get("email"),password:f.get("password")})});token=d.token;user=d.user;localStorage.setItem("mypos_token",token);showApp();await loadAll();}
-  catch(err){$("#loginError").textContent=err.message;}
+  try {
+    const d=await api("/auth/login",{
+      method:"POST",
+      body:JSON.stringify({email:String(f.get("email")||"").trim(),password:f.get("password")})
+    });
+    if(!d.token || !d.user) throw new Error("The server returned an incomplete login response. Check the Render logs.");
+    token=d.token;
+    user=d.user;
+    localStorage.setItem("mypos_token",token);
+    showApp();
+    try {
+      await loadAll();
+    } catch (loadError) {
+      toast("Signed in, but dashboard data could not load: "+loadError.message);
+    }
+  } catch(err) {
+    token=null;
+    user=null;
+    localStorage.removeItem("mypos_token");
+    showLogin();
+    error.textContent=err.message || "Login failed. Check your email and password.";
+  } finally {
+    if(submit){submit.disabled=false;submit.textContent=originalText;}
+  }
 });
 $("#logoutBtn").onclick=()=>{localStorage.removeItem("mypos_token");token=null;user=null;showLogin()};
 function navigate(page){
@@ -105,12 +147,5 @@ async function loadIntegrationStatus(){
 }
 $("#refreshIntegration").onclick=loadIntegrationStatus;
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-renderCart();boot();
-e("connected",live);
-    $("#zomatoIntegrationState").textContent=live&&s.capabilities?.zomato==="connected"?"Connected":"Awaiting onboarding";
-    $("#swiggyIntegrationState").textContent=live&&s.capabilities?.swiggy==="connected"?"Connected":"Awaiting onboarding";
-  }catch(e){toast(`Could not read integration status: ${e.message}`)}
-}
-$("#refreshIntegration").onclick=loadIntegrationStatus;
-function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-renderCart();boot();
+renderCart();
+boot();
