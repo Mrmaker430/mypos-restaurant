@@ -1,11 +1,12 @@
-const CACHE_NAME = "mypos-shell-v1";
+const CACHE_NAME = "mypos-shell-v2";
 const APP_SHELL = [
   "/",
   "/index.html",
-  "/styles.css",
-  "/app.js",
+  "/styles.css?v=drawer-sales-save-20261122",
+  "/app.js?v=drawer-sales-save-20261122",
   "/pwa.js",
   "/manifest.webmanifest",
+  "/icons/mypos-mark.svg",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/icon-maskable-512.png"
@@ -35,7 +36,7 @@ self.addEventListener("fetch", (event) => {
         const response = await fetch(request);
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
-          cache.put("/", response.clone());
+          await cache.put("/", response.clone());
         }
         return response;
       } catch {
