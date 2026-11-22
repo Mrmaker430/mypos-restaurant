@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111827"><title>MyPOS | Restaurant POS</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-card">
+      <div class="brand-mark">M</div><h1>MyPOS</h1><p class="muted">Restaurant point of sale</p>
+      <label>Email<input name="email" type="email" value="admin@example.com" required></label>
+      <label>Password<input name="password" type="password" value="" placeholder="Your password" required></label>
+      <button class="btn primary full">Sign in</button><p id="loginError" class="error"></p>
+      <small class="muted">Use the admin credentials configured in your .env file.</small>
+    </form>
+  </div>
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <div class="side-brand"><span class="brand-mark small">M</span><b>MyPOS</b></div>
+      <nav>
+        <button class="nav-link active" data-page="dashboard">▦ <span>Dashboard</span></button>
+        <button class="nav-link" data-page="pos">＋ <span>New bill</span></button>
+        <button class="nav-link" data-page="orders">▤ <span>Orders</span></button>
+        <button class="nav-link" data-page="menu">☷ <span>Menu</span></button>
+        <button class="nav-link" data-page="integrations">⇄ <span>Integrations</span></button>
+      </nav>
+      <div class="side-bottom"><span id="userName">Admin</span><button id="logoutBtn" class="nav-link">↪ <span>Sign out</span></button></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div><div class="eyebrow">RESTAURANT MANAGEMENT</div><h2 id="pageTitle">Dashboard</h2></div><div class="top-right"><span class="live-dot"></span><span>System online</span><button class="avatar" id="avatar">A</button></div></header>
+      <section id="dashboardPage" class="page">
+        <div class="stats-grid">
+          <article class="stat-card"><span>Today's sales</span><strong id="salesToday">₹0.00</strong><small>Paid orders only</small></article>
+          <article class="stat-card"><span>Today's orders</span><strong id="ordersToday">0</strong><small>Orders received today</small></article>
+          <article class="stat-card"><span>Cash collected</span><strong id="cashToday">₹0.00</strong><small>Cash payments</small></article>
+          <article class="stat-card"><span>UPI collected</span><strong id="upiToday">₹0.00</strong><small>UPI payments</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel"><div class="panel-head"><div><h3>Top selling items</h3><p class="muted">Based on today's paid orders</p></div></div><div id="topProducts" class="list-empty">No sales recorded yet.</div></article>
+          <article class="panel"><div class="panel-head"><div><h3>Quick actions</h3><p class="muted">Get started quickly</p></div></div><button class="btn primary full" data-go="pos">＋ Create new bill</button><button class="btn secondary full space-top" data-go="orders">View order history</button></article>
+        </div>
+      </section>
+      <section id="posPage" class="page hidden">
+        <div class="pos-layout">
+          <div class="panel menu-panel"><div class="panel-head"><div><h3>Menu items</h3><p class="muted">Tap an item to add it to the bill</p></div><input id="productSearch" class="search" placeholder="Search menu..."></div><div id="productGrid" class="product-grid"></div></div>
+          <div class="panel cart-panel"><div class="panel-head"><div><h3>Current bill</h3><p class="muted" id="cartCount">0 items</p></div><button id="clearCart" class="text-btn">Clear</button></div>
+            <div class="form-row"><label>Order type<select id="orderType"><option value="takeaway">Takeaway</option><option value="delivery">Delivery</option></select></label><label>Payment<select id="paymentMethod"><option value="cash">Cash</option><option value="upi">UPI</option></select></label></div>
+            <div class="customer-fields"><input id="customerName" placeholder="Customer name (optional)"><input id="customerPhone" placeholder="Phone (optional)"><input id="deliveryAddress" class="hidden" placeholder="Delivery address"></div>
+            <div id="cartItems" class="cart-items"><div class="list-empty">Your bill is empty. Add menu items.</div></div>
+            <div class="bill-totals"><div><span>Subtotal</span><b id="subtotal">₹0.00</b></div><div><span>GST</span><b id="taxTotal">₹0.00</b></div><div class="discount-row"><label for="discount">Discount (₹)</label><input id="discount" type="number" min="0" value="0"></div><div class="grand-total"><span>Total</span><strong id="grandTotal">₹0.00</strong></div></div>
+            <button id="placeOrder" class="btn primary full">Complete payment & print</button><p class="muted tiny">Confirm that payment has been received before completing the bill.</p>
+          </div>
+        </div>
+      </section>
+      <section id="ordersPage" class="page hidden"><article class="panel"><div class="panel-head"><div><h3>Order history</h3><p class="muted">Recent restaurant orders</p></div><button id="refreshOrders" class="btn secondary">Refresh</button></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Date</th><th>Type</th><th>Source</th><th>Amount</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="ordersTable"></tbody></table></div></article></section>
+      <section id="menuPage" class="page hidden"><div class="content-grid menu-admin-grid"><article class="panel"><div class="panel-head"><div><h3>Add menu item</h3><p class="muted">Only admins can add products</p></div></div><form id="productForm" class="stack-form"><label>Product name<input name="name" required></label><label>Category<select name="category" id="categorySelect"></select></label><label>Price (₹)<input name="price" type="number" min="0" step="0.01" required></label><label>GST rate (%)<input name="gstRate" type="number" min="0" max="100" step="0.01" value="0"></label><label>Description<input name="description"></label><button class="btn primary">Save product</button></form></article><article class="panel"><div class="panel-head"><div><h3>Menu catalogue</h3><p class="muted">Active products</p></div></div><div id="adminProductList"></div></article></div></section>
+      <section id="integrationsPage" class="page hidden">
+        <div class="integration-banner panel">
+          <div><div class="eyebrow">DELIVERY CHANNEL CONNECTOR</div><h3>Aggregator integrations</h3><p class="muted">One place to prepare MyPOS for Zomato and Swiggy orders.</p></div>
+          <span id="integrationState" class="integration-state">NOT CONNECTED</span>
+        </div>
+        <div class="content-grid integration-grid">
+          <article class="panel">
+            <div class="panel-head"><div><h3>UrbanPiper</h3><p class="muted">Recommended aggregator provider</p></div><span class="provider-mark">UP</span></div>
+            <p class="integration-copy">UrbanPiper acts as the bridge between delivery marketplaces and a POS. It supports Zomato and Swiggy restaurant channels, but a custom POS such as MyPOS must complete UrbanPiper's POS-partner onboarding and technical integration before orders can flow into this app.</p>
+            <div class="provider-status-row"><span>Zomato</span><b id="zomatoIntegrationState">Awaiting onboarding</b></div>
+            <div class="provider-status-row"><span>Swiggy</span><b id="swiggyIntegrationState">Awaiting onboarding</b></div>
+            <div class="integration-actions"><a class="btn primary" href="https://www.urbanpiper.com/in/hub" target="_blank" rel="noopener">Restaurant Hub information ↗</a><a class="btn secondary" href="https://www.urbanpiper.com/partner-with-us" target="_blank" rel="noopener">MyPOS POS-partner enquiry ↗</a></div>
+          </article>
+          <article class="panel">
+            <h3>What is required before live orders?</h3>
+            <ol class="integration-checklist">
+              <li>Activate an UrbanPiper account for your restaurant and verify your outlet details.</li>
+              <li>Ask UrbanPiper about onboarding MyPOS as a POS integration partner. Request developer documentation, sandbox credentials and a named integration contact.</li>
+              <li>Complete Zomato and Swiggy outlet mapping in UrbanPiper. Their setup requires your active marketplace outlet IDs and URLs.</li>
+              <li>After UrbanPiper approves the MyPOS integration, provide its official webhook/API specifications and credentials so the adapter can be completed and tested.</li>
+            </ol>
+            <p class="integration-warning"><b>Live status:</b> Not connected. MyPOS does not currently receive, accept, reject, or update marketplace orders. No test orders or fake API calls are generated.</p>
+          </article>
+        </div>
+        <article class="panel integration-footnote"><h3>Current MyPOS behaviour</h3><p class="muted">Your existing billing, cash/UPI checkout, menu and thermal receipt features continue to work. Orders created at the counter are marked as POS orders. Zomato/Swiggy orders will only appear after the provider approves MyPOS and the real integration is implemented with their supplied documentation.</p><button id="refreshIntegration" class="btn secondary">Refresh connection status</button></article>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+  <div id="receipt" class="receipt"></div>
+  <script src="/app.js"></script>
+</body></html>
