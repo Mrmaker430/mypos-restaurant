@@ -11,7 +11,7 @@
   <title>MyPOS | Restaurant POS</title>
   <link rel="icon" type="image/svg+xml" href="/icons/mypos-mark.svg">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <link rel="stylesheet" href="/styles.css?v=drawer-sales-save-20261122">
 </head>
@@ -92,7 +92,7 @@
             <p class="integration-warning"><b>Live status:</b> Not connected. MyPOS does not currently receive, accept, reject, or update marketplace orders. No test orders or fake API calls are generated.</p>
           </article>
         </div>
-        <article class="panel integration-footnote"><h3>Current MyPOS behaviour</h3><p class="muted">Your existing billing, cash/UPI checkout, menu and thermal receipt features continue to work. Orders created at the counter are marked as POS orders. Zomato/Swiggy orders will only appear after the provider approves MyPOS and the real integration is implemented with their supplied documentation.</p><button id="refreshIntegration" class="btn secondary">Refresh connection status</button></article>
+        <article class="panel integration-footnote"><h3>Current MyPOS behaviour</h3><p class="muted">Your existing billing, cash/UPI checkout, menu and order history continue to work. Printing is disabled for now; orders are saved to the database only. Orders created at the counter are marked as POS orders. Zomato/Swiggy orders will only appear after the provider approves MyPOS and the real integration is implemented with their supplied documentation.</p><button id="refreshIntegration" class="btn secondary">Refresh connection status</button></article>
       </section>
     </main>
   </div>
