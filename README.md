@@ -136,3 +136,17 @@ Deploy the whole project as one Render Web Service; do not deploy `public/` sepa
 - Use a strong unique admin password. Do not share the Render environment values or MongoDB connection string.
 - Thermal printing uses the browser print dialog; test your printer and paper width at the restaurant before relying on it.
 - Zomato/Swiggy are not live integrations. Their order feeds remain unavailable until the approved integration provider has onboarded this POS and supplied credentials/specifications.
+
+
+## Admin login recovery
+
+The admin account is created once from `ADMIN_EMAIL` and `ADMIN_PASSWORD`. Changing `ADMIN_PASSWORD` in Render does not normally overwrite an existing user's password.
+
+If you need to reset the admin password:
+1. In Render → MyPOS service → Environment, set `ADMIN_PASSWORD` to a new unique password (at least 12 characters).
+2. Temporarily add `ADMIN_RESET_PASSWORD=true`.
+3. Save and redeploy. On startup, MyPOS updates the password for the configured `ADMIN_EMAIL`.
+4. Sign in using that email and new password.
+5. Immediately remove `ADMIN_RESET_PASSWORD` (or set it to `false`) and redeploy again.
+
+Do not leave `ADMIN_RESET_PASSWORD=true` enabled for normal operation.
